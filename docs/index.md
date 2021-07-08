@@ -16,7 +16,7 @@
 
 3. How Does the Custom Resource Work?
       
-      <img src="images/image1.png" class="inline"/>
+      <img src="images/image1.png" class="inline" width="700" height="400"/>
 
     - User starts deployment of a CloudFormation template.
 
