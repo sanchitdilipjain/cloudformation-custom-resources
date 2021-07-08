@@ -95,3 +95,13 @@
     - Next, CloudFormation continues the execution with the rest of the stack deployment operations
 
 4. Demo 
+
+    - Consider a scenario where a CloudFormation template creates a new S3 bucket during deployment and deletes this bucket during stack teardown. If this S3 bucket holds any objects, then deletion will fail because CloudFormation service can delete only empty buckets. This will cause entire teardown operation to fail and CloudFormation service will not proceed with deleting rest of the resources. To work around this problem, we can use a lambda-backed custom resource. During teardown, this lambda can delete all the objects in the S3 bucket. Then, CloudFormation can proceed to delete the empty bucket.
+
+    - The following diagram shows the architectural components of the solution:
+    
+        <img src="images/image2.png" class="inline" width="700" height="400"/>
+
+    - Link for Cloudformation 
+    
+    - Link for Custom Resource Lambda
