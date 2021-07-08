@@ -10,22 +10,88 @@
 
 2. What are CloudFormation Custom Resources?
 
-    - A custom resource is a custom type that is powered by a Lambda function to execute a task which CloudFormation unable to do it for example retrieving an AMI ID, or the CIDR block for a VPC. 
+    - A custom resource is a custom type powered by a Lambda function to execute a task that CloudFormation cannot do, for example, retrieving an AMI ID or the CIDR block for a VPC. 
     
-    - Custom resources have a “request type” included with the request, allowing the custom resource to create, update and delete whatever it is doing. Outside to just normal lookup, there are more capabilites an AWS CloudFormation Custom Resource can provide
+    - Custom resources have a “request type” included with the request, allowing the custom resource to create, update and delete whatever it is doing. Outside to just normal lookup, there are more capabilities an AWS CloudFormation Custom Resource can provide
 
 3. How Does the Custom Resource Work?
       
       <img src="images/image1.png" class="inline" width="700" height="400"/>
 
-    - User starts deployment of a CloudFormation template.
+    - Let's assume we are deploying the below custom resource as part of the CloudFormation template.
+    
+        ```MyResource:
+        Type: Custom::Test
+        Properties:
+            ServiceToken: LambdaARN
+            Name: “Value”
+            List: ["1","2","3","4"]
+         ```
+         
+    - When CloudFormation runs the above input, it uses the ServiceToken to lookup the Lambda function it is aspected to invoke and sends the parameters to that function.
+        
+        ``` {
+              "RequestType" : "Create",
+              "ResponseURL" : “foo”,
+              "StackId" : ”bar”,
+              "RequestId" : "unique id”,
+              "ResourceType" : "Custom::Test",
+              "LogicalResourceId" : "MyResource",
+              "ResourceProperties" :
+               {
+                 "Name" : "Value", 
+                 "List" : [ "1", "2", "3" ]
+               }
+             }
+         ``` 
 
-    - CloudFormation service sends a “Create” event to the custom resource’s Service Token. This event contains the pre-signed URL that the Service Token should use to post its response.
+    - The request also contains a pre-signed URL leveraged by the Lambda function to return the response. All of the interaction between the custom resource and CloudFormation is conducted via this pre-signed URL. If the custom resource doesn’t return the information to the pre-signed URL, the CloudFormation will not complete. If we don't specify a timeout for the stack creation, the stack will hang for hours.
 
-    - The Service Token executes its custom logic.
+        ```{
+              "RequestType": "Create", 
+              "ServiceToken": LambdaARN, 
+              "ResponseURL": "foo",
+              "StackId": "bar", 
+              "RequestId": "unique id", 
+              "LogicalResourceId": "MyResource", 
+              "ResourceType’: "Custom::Test", 
+              "ResourceProperties":{
+                "ServiceToken": LambdaARN, 
+                "Name" : "Value", 
+                "List" : [ "1", "2", "3" ]
+                }
+              }
+         ```
 
-    - Service Token then sends a response to the CloudFormation service by invoking the pre-signed S3 URL, indicating success or failure
+    - In this sample request, there are several entries:
 
-    - CloudFormation service proceeds with rest of the stack deployment operations
+        - RequestType: It holds either create, update or delete. And used to assist the custom resource to decide what to do
+
+        - ServiceToken: service token holds Custom resource ARN where CloudFormation needs to send the requests
+
+        - ResponseURL: This is the pre-signed URL where the response must be sent back to the CloudFormation.
+
+        - StackId: stack ID contains the custom resource request.
+
+        - RequestId: AWS provided an unique request ID.
+
+        - LogicalResourceId: name of the logical resource as it appears in the stack.
+
+        - ResourceType: name of the resource as mentioned in the stack.
+
+        - ResourceProperties: parameters that are provided to the function.
+
+    - After the custom resource function executes, it returns the following response to CloudFormation using the pre-signed URL provided in the Request data.
+     
+         ```{
+            "Status" : "SUCCESS",
+            "PhysicalResourceId" : “baz”,
+             "StackId" : “bar”,
+             "RequestId" : "unique id”,
+             "LogicalResourceId" : "MyResource"
+           } 
+         ```
+
+    - Next, CloudFormation continues the execution with the rest of the stack deployment operations
 
 4. Demo 
