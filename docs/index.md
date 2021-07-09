@@ -1,4 +1,4 @@
-## Custom resources
+## Cloudformation Custom resources
 
 1. What is AWS Cloudformation?
 
