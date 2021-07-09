@@ -148,7 +148,7 @@
             
             - Failed State
               
-               <img src="images/image9.png" class="inline" width="700" height="200"/>
+               <img src="images/image9.png" class="inline" width="700" height="400"/>
      
         
         
