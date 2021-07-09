@@ -96,12 +96,59 @@
 
 4. Demo 
 
-    - Consider a scenario where a CloudFormation template creates a new S3 bucket during deployment and deletes this bucket during stack teardown. If this S3 bucket holds any objects, then deletion will fail because CloudFormation service can delete only empty buckets. This will cause entire teardown operation to fail and CloudFormation service will not proceed with deleting rest of the resources. To work around this problem, we can use a lambda-backed custom resource. During teardown, this lambda can delete all the objects in the S3 bucket. Then, CloudFormation can proceed to delete the empty bucket.
+    - In this demo, we will leverage Cloudformation custom resource to copy data from one S3 bucket to other S3 bucket, and post successful copy the cloudformation stack will be completed
 
     - The following diagram shows the architectural components of the solution:
     
-        <img src="images/image2.png" class="inline" width="700" height="400"/>
+        <img src="images/image2.png" class="inline" width="300" height="300"/>
 
-    - Link for Cloudformation 
+    - <a href="https://github.com/sanchitdilipjain/cloudformation-custom-resources/blob/main/custom-resource-template.yaml">Link to Cloudformation template</a>
     
-    - Link for Custom Resource Lambda
+    - Steps to deploy Cloudformation
+    
+        1. Open the AWS CloudFormation console at<a href="https://console.aws.amazon.com/cloudformation/"> link </a>
+
+        2. Choose Create Stack.
+
+        3. In the Template section, choose to Upload a template file, and then choose a file under the upload section
+            
+            <img src="images/image3.png" class="inline" width="700" height="400"/>
+
+        4. Choose Next.
+
+        5. In the Stack name field, type custom-resource-tutorial, and under the Parameters section, provide the following parameter, and then choose Next.
+        
+            - DestinationBucket
+            
+            - SourceBucketName
+            
+            - SourceObjects
+            
+            - SourceS3KeyPrefix
+            
+            <img src="images/image4.png" class="inline" width="700" height="400"/>
+
+        6. For this walkthrough, we will preserve all advanced settings as a default state, so choose Next.
+
+        7. Ensure that the stack name and template URL are correct, and then choose Create to.
+        
+            <img src="images/image5.png" class="inline" width="700" height="400"/>
+            
+            <img src="images/image6.png" class="inline" width="700" height="200"/>
+       
+        8. If the custom resource is executed successfully then the Cloudformation stack will be in Create Complete status, if due to some reason the custom resources execution failed then Cloudformation will be stuck for hours if the timeout is not mentioned or will be in Failed status once the timeout is over.
+        
+            - Cloudformation in-progress state
+            
+               <img src="images/image7.png" class="inline" width="700" height="250"/>
+            
+            - Successful State
+               
+               <img src="images/image8.png" class="inline" width="700" height="400"/>
+            
+            - Failed State
+              
+               <img src="images/image9.png" class="inline" width="700" height="200"/>
+     
+        
+        
