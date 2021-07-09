@@ -2,20 +2,20 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: This CloudFormation Template invokes custom resource lambda responsible for copying files from one S3 Bucket to another S3 Bucket
 Parameters:
   SourceBucketName:
-    Default: cft-custom-resources-demo
+    Default: source-bucket-name
     Type: String
   SourceS3KeyPrefix:
-    Default: code
+    Default: code/
     Type: String
   DestinationBucket:
     Type: String
-    Default: ""
+    Default: dest-bucket-name
   SourceObjects:
     Type: CommaDelimitedList
-    Default: "image1.png,image2.png,image3.png"
+    Default: "file.txt,file2.txt,file3.txt"
 Conditions:
   CreateDestBucket: !Equals [!Ref DestinationBucket, ""]
-  UsingDefaultBucket: !Equals [!Ref SourceBucketName, 'cft-custom-resources-demo']
+  UsingDefaultBucket: !Equals [!Ref SourceBucketName, 'source-bucket-name']
 Resources:
   ArtifactsBucket:
     Condition: CreateDestBucket
@@ -40,7 +40,7 @@ Resources:
             Effect: Allow
             Action:
               - logs:*
-            Resource: !Sub arn:${AWS::Partition}:s3:::*
+            Resource: arn:aws:logs:*:*:*
           - Sid: S3Get
             Effect: Allow
             Action:
