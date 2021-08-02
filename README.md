@@ -16,6 +16,6 @@
 
 - How Does the Custom Resource Work?
       
-  <p align="center"><img src="docs/images/image1.png" class="inline" width="700" height="400"/></p>
+  <p align="center"><img src="docs/images/image1.png" class="inline" width="600" height="350"/></p>
    
 - Demo Blog <a href="https://sanchitdilipjain.github.io/aws-layered-vpc-architecture/">link</a>     
